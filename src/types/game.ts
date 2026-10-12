@@ -5,7 +5,8 @@ export type UpgradeType =
   | 'acceleration' 
   | 'brakeStrength' 
   | 'airControl' 
-  | 'suspension';
+  | 'suspension'
+  | 'nitro';
 
 export interface BikeUpgrades {
   enginePower: number; // 1 to 5
@@ -13,6 +14,7 @@ export interface BikeUpgrades {
   brakeStrength: number;
   airControl: number;
   suspension: number;
+  nitro: number;
 }
 
 export interface BikeConfig {

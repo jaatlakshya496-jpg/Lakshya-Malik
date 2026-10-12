@@ -33,7 +33,7 @@ export const HUD: React.FC<HUDProps> = ({
     }
   };
 
-  const speedKmh = Math.round(Math.hypot(state.vx, state.vy) * 4.8);
+  const speedKmh = Math.round(Math.hypot(state.vx, state.vy) * 3.6);
   const progressRatio = Math.max(0, Math.min(1, state.x / level.finishX));
   const progressPercent = Math.round(progressRatio * 100);
 
@@ -44,11 +44,11 @@ export const HUD: React.FC<HUDProps> = ({
     <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-3 sm:p-5">
       {/* Active Stunt Air Combo! Overlay */}
       {isComboActive && (
-        <div className="absolute top-18 sm:top-20 left-1/2 -translate-x-1/2 pointer-events-none z-40 flex flex-col items-center animate-combo-bounce">
-          <div className="bg-gradient-to-r from-red-600/90 via-amber-500/95 to-yellow-500/90 backdrop-blur-md border-2 border-yellow-300 rounded-2xl px-5 sm:px-7 py-2.5 flex items-center gap-3 shadow-[0_0_35px_rgba(245,158,11,0.9)]">
-            <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-200 fill-yellow-300 animate-pulse" />
+        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 pointer-events-none z-40 flex flex-col items-center">
+          <div className="bg-gradient-to-r from-amber-500/80 via-amber-400/90 to-yellow-300/80 backdrop-blur-md border-2 border-amber-300 rounded-xl px-4 sm:px-6 py-2 flex items-center gap-3 shadow-[0_0_30px_rgba(245,158,11,0.8)]">
+            <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-200 fill-yellow-300 animate-pulse" />
             <div className="flex flex-col items-start leading-none">
-              <div className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white font-racing drop-shadow-md">
+              <div className="text-xl sm:text-2xl font-black uppercase tracking-wider text-white">
                 Combo! x{multiplier}
               </div>
               <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-yellow-100 flex items-center gap-1 mt-0.5">
@@ -65,7 +65,7 @@ export const HUD: React.FC<HUDProps> = ({
         <div className="flex items-center gap-2 sm:gap-4 pointer-events-auto">
           {/* Stunt Score */}
           <div className="bg-slate-900/85 backdrop-blur-md border border-amber-500/40 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-lg">
-            <Trophy className="w-5 h-5 text-amber-400 animate-pulse" />
+            <Trophy className="w-5 h-5 text-amber-400" />
             <div>
               <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">SCORE</div>
               <div className="text-base sm:text-lg font-black text-amber-300 font-racing leading-none">
@@ -114,7 +114,7 @@ export const HUD: React.FC<HUDProps> = ({
           {/* Restart from checkpoint */}
           <button
             onClick={onRestartCheckpoint}
-            title="Restart from Checkpoint (R)"
+            title="Restart from checkpoint (R)"
             className="w-10 h-10 rounded-xl bg-slate-900/85 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition active:scale-95 shadow-md"
           >
             <RotateCcw className="w-5 h-5" />
@@ -155,7 +155,7 @@ export const HUD: React.FC<HUDProps> = ({
         </div>
       </div>
 
-      {/* Physics Debug Telemetry Overlay (Step 9 Requirements) */}
+      {/* Physics Debug Telemetry Overlay */}
       {isDebugActive && (
         <div className="pointer-events-auto absolute top-20 left-4 bg-slate-950/90 backdrop-blur-md border border-emerald-500/60 rounded-xl p-3 font-mono text-xs text-emerald-300 shadow-2xl max-w-xs space-y-1 z-50">
           <div className="font-bold uppercase tracking-wider text-emerald-400 border-b border-emerald-500/30 pb-1 flex items-center justify-between">

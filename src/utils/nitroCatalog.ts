@@ -7,6 +7,7 @@ export interface NitroItem {
   color: string;
   secondaryColor: string;
   particleStyle: 'flame' | 'plasma' | 'fireball' | 'quantum' | 'gold_sparks';
+  boostMultiplier: number; // Speed multiplier while active
 }
 
 export const NITRO_ITEMS: NitroItem[] = [
@@ -19,6 +20,7 @@ export const NITRO_ITEMS: NitroItem[] = [
     color: '#ef4444',
     secondaryColor: '#fbbf24',
     particleStyle: 'flame',
+    boostMultiplier: 1.15,
   },
   {
     id: 'cyber_blue',
@@ -29,6 +31,7 @@ export const NITRO_ITEMS: NitroItem[] = [
     color: '#06b6d4',
     secondaryColor: '#3b82f6',
     particleStyle: 'plasma',
+    boostMultiplier: 1.20,
   },
   {
     id: 'inferno_booyah',
@@ -39,6 +42,7 @@ export const NITRO_ITEMS: NitroItem[] = [
     color: '#f97316',
     secondaryColor: '#ef4444',
     particleStyle: 'fireball',
+    boostMultiplier: 1.25,
   },
   {
     id: 'chrono_purple',
@@ -49,6 +53,7 @@ export const NITRO_ITEMS: NitroItem[] = [
     color: '#a855f7',
     secondaryColor: '#c084fc',
     particleStyle: 'quantum',
+    boostMultiplier: 1.30,
   },
   {
     id: 'gold_royale',
@@ -59,5 +64,40 @@ export const NITRO_ITEMS: NitroItem[] = [
     color: '#eab308',
     secondaryColor: '#fef08a',
     particleStyle: 'gold_sparks',
+    boostMultiplier: 1.35,
+  },
+  // NEW: Additional nitro items
+  {
+    id: 'ice_cold',
+    name: 'Ice Cold',
+    description: 'Cool blue-white frost thrust with trailing ice particles.',
+    price: 800,
+    rarity: 'Rare',
+    color: '#3b82f6',
+    secondaryColor: '#60a5fa',
+    particleStyle: 'plasma',
+    boostMultiplier: 1.18,
+  },
+  {
+    id: 'sky_high',
+    name: 'Sky High',
+    description: 'Purple-pink sunset gradient boost for aerial stunts.',
+    price: 1500,
+    rarity: 'Epic',
+    color: '#ec4899',
+    secondaryColor: '#f472b6',
+    particleStyle: 'flame',
+    boostMultiplier: 1.22,
+  },
+  {
+    id: 'lightning',
+    name: 'Lightning Strike',
+    description: 'Electric yellow-blue bolt with crackling particle effects.',
+    price: 3000,
+    rarity: 'Legendary',
+    color: '#f59e0b',
+    secondaryColor: '#a855f7',
+    particleStyle: 'fireball',
+    boostMultiplier: 1.32,
   },
 ];

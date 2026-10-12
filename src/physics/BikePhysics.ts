@@ -103,6 +103,8 @@ export class BikePhysicsEngine {
   private readonly SUSPENSION_REST_LENGTH = 22;
   private readonly SUSPENSION_STIFFNESS = 0.38;
   private readonly SUSPENSION_DAMPING = 0.24;
+  private readonly MAX_DT = 2.0;
+  private readonly MIN_DT = 0.5;
 
   constructor(level: LevelData, bike: BikeConfig) {
     this.level = level;
@@ -224,7 +226,7 @@ export class BikePhysicsEngine {
       return this.state;
     }
 
-    const clampedDt = Math.min(2.0, Math.max(0.5, dt));
+    const clampedDt = Math.min(this.MAX_DT, Math.max(this.MIN_DT, dt));
 
     // Decrement recovery grace window if active
     if (this.recoveryGraceFrames > 0) {

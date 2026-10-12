@@ -29,7 +29,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   useEffect(() => {
     // Connect particle and stunt notifications to engine
-    engine.setParticleCallback((type, x, y, count = 5) => {
+    engine.setParticleCallback((type: string, x: number, y: number, count = 5) => {
       spawnParticles(type, x, y, count);
     });
 
@@ -148,48 +148,40 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     let isRunning = true;
-
-    // Handle high-DPI crisp rendering
-    const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
     let lastTimestamp = performance.now();
+    let fixedAccumulator = 0;
+    const fixedDt = 1 / 60;
 
-    const renderLoop = (timestamp: number) => {
+    const gameLoop = (timestamp: number) => {
       if (!isRunning) return;
 
       const now = timestamp || performance.now();
-      const elapsed = (now - lastTimestamp) / 1000;
+      const frameDt = (now - lastTimestamp) / 1000;
       lastTimestamp = now;
+      fixedAccumulator += frameDt;
 
-      // dt = 1.0 at 60fps. Clamped between 0.5 (120Hz) and 2.0 (30Hz)
-      const dt = Math.min(2.0, Math.max(0.5, elapsed * 60));
-
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      // Physics Step (if not paused)
+      // Update physics at fixed step for consistency
       if (!paused) {
-        engine.update(controls, dt);
+        while (fixedAccumulator >= fixedDt) {
+          engine.update(controls, fixedDt);
+          fixedAccumulator -= fixedDt;
+        }
       }
 
       const state = engine.getState();
       const bike = engine.getBike();
       const level = engine.getLevel();
 
-      // Camera Follow with forward lookahead & speed zoom
       const speed = Math.hypot(state.vx, state.vy);
 
       // Visual trail effect for the bike tires during high-speed jumps and stunts
@@ -211,25 +203,26 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         }
       }
 
+      // Camera Follow with forward lookahead & speed zoom
       const targetLookahead = Math.min(220, state.vx * 14);
       const targetCamX = state.x + targetLookahead;
       const targetCamY = state.y - 40;
 
       // Smooth camera interpolation
-      cameraRef.current.x += (targetCamX - cameraRef.current.x) * 0.1;
-      cameraRef.current.y += (targetCamY - cameraRef.current.y) * 0.08;
+      cameraRef.current.x += (targetCamX - cameraRef.current.x) * 0.15;
+      cameraRef.current.y += (targetCamY - cameraRef.current.y) * 0.12;
 
-      // Dynamic zoom
-      const targetZoom = Math.max(0.78, Math.min(1.05, 1.0 - (speed / 30) * 0.25));
-      cameraRef.current.zoom += (targetZoom - cameraRef.current.zoom) * 0.05;
+      // Dynamic zoom - less aggressive for stability
+      const targetZoom = Math.max(0.78, Math.min(1.05, 1.0 - (speed / 35) * 0.2));
+      cameraRef.current.zoom += (targetZoom - cameraRef.current.zoom) * 0.08;
 
       // Screen Shake
       let shakeOffsetX = 0;
       let shakeOffsetY = 0;
       if (cameraRef.current.shake > 0) {
-        shakeOffsetX = (Math.random() - 0.5) * cameraRef.current.shake * 3;
-        shakeOffsetY = (Math.random() - 0.5) * cameraRef.current.shake * 3;
-        cameraRef.current.shake = Math.max(0, cameraRef.current.shake - 0.25);
+        shakeOffsetX = (Math.random() - 0.5) * cameraRef.current.shake * 2;
+        shakeOffsetY = (Math.random() - 0.5) * cameraRef.current.shake * 2;
+        cameraRef.current.shake = Math.max(0, cameraRef.current.shake - 0.2);
       }
 
       // Clear & Draw Sky Gradient
@@ -262,7 +255,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       // Render Ghost Rider if enabled
       if (ghostEnabled && ghostReplay && ghostReplay.frames && ghostReplay.frames.length > 0) {
         const currentTick = engine.getCurrentFrameTick();
-        const ghostFrame = ghostReplay.frames[currentTick] || ghostReplay.frames[ghostReplay.frames.length - 1];
+        const ghostFrame = ghostReplay.frames[Math.min(currentTick, ghostReplay.frames.length - 1)];
         if (ghostFrame) {
           drawGhostBike(ctx, ghostFrame);
         }
@@ -277,15 +270,14 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
       ctx.restore();
 
-      animFrameRef.current = requestAnimationFrame(renderLoop);
+      animFrameRef.current = requestAnimationFrame(gameLoop);
     };
 
-    animFrameRef.current = requestAnimationFrame(renderLoop);
+    animFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       isRunning = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      window.removeEventListener('resize', handleResize);
     };
   }, [engine, controls, paused]);
 
@@ -357,7 +349,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   };
 
   // Terrain polyline rendering
-  const drawTerrain = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawTerrain = (ctx: CanvasRenderingContext2D, level: any) => {
     const terrain = level.terrain;
     if (terrain.length < 2) return;
 
@@ -401,8 +393,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawLevelDecorations = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
-    // Stunt ramp support beams
+  const drawLevelDecorations = (ctx: CanvasRenderingContext2D, level: any) => {
     ctx.save();
     ctx.strokeStyle = 'rgba(75, 85, 99, 0.4)';
     ctx.lineWidth = 4;
@@ -420,7 +411,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawMovingPlatforms = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawMovingPlatforms = (ctx: CanvasRenderingContext2D, level: any) => {
     if (!level.movingPlatforms) return;
     ctx.save();
     for (const p of level.movingPlatforms) {
@@ -450,7 +441,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawLoops = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawLoops = (ctx: CanvasRenderingContext2D, level: any) => {
     if (!level.loops) return;
     ctx.save();
     for (const loop of level.loops) {
@@ -481,7 +472,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawFireRings = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawFireRings = (ctx: CanvasRenderingContext2D, level: any) => {
     if (!level.fireRings) return;
     ctx.save();
     const time = Date.now() * 0.006;
@@ -508,7 +499,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawCoins = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawCoins = (ctx: CanvasRenderingContext2D, level: any) => {
     ctx.save();
     const spin = Math.sin(Date.now() * 0.005);
     for (const coin of level.coins) {
@@ -539,7 +530,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawCheckpoints = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawCheckpoints = (ctx: CanvasRenderingContext2D, level: any) => {
     ctx.save();
     for (const cp of level.checkpoints) {
       // Flagpole
@@ -568,7 +559,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.restore();
   };
 
-  const drawFinishLine = (ctx: CanvasRenderingContext2D, level: typeof engine extends { getLevel(): infer T } ? T : never) => {
+  const drawFinishLine = (ctx: CanvasRenderingContext2D, level: any) => {
     const fx = level.finishX;
     ctx.save();
 
@@ -651,7 +642,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.lineTo(-34, -2);
     ctx.stroke();
 
-    // Exhaust throttle flame & Automatic High-Speed Nitro effect
+    // Exhaust throttle flame & High-Speed Nitro effect
     const nitroItem = NITRO_ITEMS.find((item) => item.id === selectedNitro) || NITRO_ITEMS[0];
     const topSpeed = bike.baseStats.topSpeed;
     const isHighSpeedNitro = Math.abs(state.vx) >= topSpeed * 0.75 && !state.crashed;

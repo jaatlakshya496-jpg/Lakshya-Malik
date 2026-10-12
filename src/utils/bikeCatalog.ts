@@ -136,6 +136,88 @@ export const INITIAL_BIKES: BikeConfig[] = [
       suspension: 1,
     },
   },
+  // NEW: Additional bikes for more variety
+  {
+    id: 'nitro_racer',
+    name: 'Nitro Racer X',
+    subtitle: 'High-speed racing machine with aggressive aerodynamic design',
+    price: 3500,
+    unlocked: false,
+    color: '#ff6b35',
+    accentColor: '#f87171',
+    glowColor: '#ff8c42',
+    riderSuitColor: '#ff3366',
+    riderHelmetColor: '#ffffff',
+    baseStats: {
+      topSpeed: 22.0,
+      torque: 0.95,
+      brakePower: 1.3,
+      flipSpeed: 0.065,
+      shockAbsorb: 0.72,
+      weight: 0.88,
+    },
+    upgrades: {
+      enginePower: 1,
+      acceleration: 1,
+      brakeStrength: 1,
+      airControl: 1,
+      suspension: 1,
+    },
+  },
+  {
+    id: 'enduro_ranger',
+    name: 'Enduro Ranger',
+    subtitle: 'Rugged trail bike built for rough terrain and technical stunts',
+    price: 2500,
+    unlocked: false,
+    color: '#22c55e',
+    accentColor: '#84cc16',
+    glowColor: '#4ade80',
+    riderSuitColor: '#16a34a',
+    riderHelmetColor: '#fbbf24',
+    baseStats: {
+      topSpeed: 16.5,
+      torque: 0.9,
+      brakePower: 1.0,
+      flipSpeed: 0.058,
+      shockAbsorb: 0.92,
+      weight: 1.1,
+    },
+    upgrades: {
+      enginePower: 1,
+      acceleration: 1,
+      brakeStrength: 1,
+      airControl: 1,
+      suspension: 1,
+    },
+  },
+  {
+    id: 'speed_demon',
+    name: 'Speed Demon',
+    subtitle: 'Sleek black speed demon with inferno accents',
+    price: 4200,
+    unlocked: false,
+    color: '#1e293b',
+    accentColor: '#eab308',
+    glowColor: '#fcd34d',
+    riderSuitColor: '#fbbf24',
+    riderHelmetColor: '#eab308',
+    baseStats: {
+      topSpeed: 24.0,
+      torque: 0.8,
+      brakePower: 1.5,
+      flipSpeed: 0.075,
+      shockAbsorb: 0.65,
+      weight: 0.8,
+    },
+    upgrades: {
+      enginePower: 1,
+      acceleration: 1,
+      brakeStrength: 1,
+      airControl: 1,
+      suspension: 1,
+    },
+  },
 ];
 
 export const UPGRADE_METADATA: Record<UpgradeType, { name: string; description: string; icon: string }> = {
@@ -183,12 +265,20 @@ export function computeEffectiveStats(bike: BikeConfig, upgrades?: BikeUpgrades)
   const air = currentUpgrades.airControl - 1;
   const sus = currentUpgrades.suspension - 1;
 
+  // Pre-compute frequently used values
+  const speedMultiplier = 1 + eng * 0.09;
+  const torqueMultiplier = 1 + acc * 0.12;
+  const brakeMultiplier = 1 + brk * 0.14;
+  const flipMultiplier = 1 + air * 0.15;
+  const shockMultiplier = Math.min(0.96, bike.baseStats.shockAbsorb * (1 + sus * 0.08));
+  const weightMultiplier = 1 - (eng + air) * 0.02;
+
   return {
-    topSpeed: bike.baseStats.topSpeed * (1 + eng * 0.09),
-    torque: bike.baseStats.torque * (1 + acc * 0.12),
-    brakePower: bike.baseStats.brakePower * (1 + brk * 0.14),
-    flipSpeed: bike.baseStats.flipSpeed * (1 + air * 0.15),
-    shockAbsorb: Math.min(0.96, bike.baseStats.shockAbsorb * (1 + sus * 0.08)),
-    weight: bike.baseStats.weight * (1 - (eng + air) * 0.02),
+    topSpeed: bike.baseStats.topSpeed * speedMultiplier,
+    torque: bike.baseStats.torque * torqueMultiplier,
+    brakePower: bike.baseStats.brakePower * brakeMultiplier,
+    flipSpeed: bike.baseStats.flipSpeed * flipMultiplier,
+    shockAbsorb: shockMultiplier,
+    weight: bike.baseStats.weight * weightMultiplier,
   };
 }
