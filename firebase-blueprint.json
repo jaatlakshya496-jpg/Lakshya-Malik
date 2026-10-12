@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Global stunt leaderboard entry representing a player high score run",
+      "type": "object",
+      "properties": {
+        "playerName": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Rider display name"
+        },
+        "score": {
+          "type": "number",
+          "description": "Total stunt points score achieved"
+        },
+        "bestStunt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Best stunt trick performed in the run"
+        },
+        "levelName": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Level or track completed"
+        },
+        "bikeName": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Motorcycle model used"
+        },
+        "coinsCollected": {
+          "type": "number",
+          "description": "Coins collected during the run"
+        },
+        "userId": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Authentication UID of the user who achieved this score"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when this high score was submitted"
+        }
+      },
+      "required": ["playerName", "score", "bestStunt", "levelName", "bikeName", "userId"]
+    }
+  },
+  "firestore": {
+    "/leaderboard/{entryId}": {
+      "schema": "LeaderboardEntry",
+      "description": "Global stunt scores leaderboard"
+    }
+  }
+}

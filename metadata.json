@@ -1,0 +1,6 @@
+{
+  "name": "Malik Bike Stunt 2D",
+  "description": "High-octane 2D side-scrolling bike stunt game with realistic physics, flips, wheelies, upgrades, and 5 stunt tracks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidLeaderboardEntry(data) {
+      return data.keys().hasAll(['playerName', 'score', 'bestStunt', 'levelName', 'bikeName', 'userId']) &&
+        data.keys().hasOnly(['playerName', 'score', 'bestStunt', 'levelName', 'bikeName', 'userId', 'coinsCollected', 'createdAt']) &&
+        data.userId == request.auth.uid &&
+        data.playerName is string && data.playerName.size() >= 1 && data.playerName.size() <= 32 &&
+        data.score is number && data.score >= 0 && data.score <= 10000000 &&
+        data.bestStunt is string && data.bestStunt.size() >= 1 && data.bestStunt.size() <= 64 &&
+        data.levelName is string && data.levelName.size() >= 1 && data.levelName.size() <= 64 &&
+        data.bikeName is string && data.bikeName.size() >= 1 && data.bikeName.size() <= 64 &&
+        data.userId is string && data.userId.size() <= 128 &&
+        (!('coinsCollected' in data) || (data.coinsCollected is number && data.coinsCollected >= 0 && data.coinsCollected <= 100000)) &&
+        (!('createdAt' in data) || data.createdAt == request.time);
+    }
+
+    match /leaderboard/{entryId} {
+      // Top 10 stunt scores are public for all players to compete
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(entryId) && isValidLeaderboardEntry(incoming());
+      allow update: if false; // Stunt runs are immutable records
+      allow delete: if isSignedIn() && isValidId(entryId) && existing().userId == request.auth.uid;
+    }
+  }
+}
