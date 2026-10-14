@@ -26,6 +26,35 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
+    },
+  },
+  {
+    id: 'dirt_jumper',
+    name: 'Inferno Booyah Beast',
+    subtitle: 'Fiery flaming dirt bike crafted for brutal stunt jumps',
+    price: 1200,
+    unlocked: false,
+    color: '#f97316',
+    accentColor: '#facc15',
+    glowColor: '#fb923c',
+    riderSuitColor: '#ea580c',
+    riderHelmetColor: '#fef08a',
+    baseStats: {
+      topSpeed: 17.0,
+      torque: 0.88,
+      brakePower: 1.1,
+      flipSpeed: 0.06,
+      shockAbsorb: 0.86,
+      weight: 1.02,
+    },
+upgrades: {
+      enginePower: 1,
+      acceleration: 1,
+      brakeStrength: 1,
+      airControl: 1,
+      suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -53,6 +82,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -80,6 +110,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -107,6 +138,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -134,6 +166,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   // NEW: Additional bikes for more variety
@@ -162,6 +195,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -189,6 +223,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
   {
@@ -216,6 +251,7 @@ export const INITIAL_BIKES: BikeConfig[] = [
       brakeStrength: 1,
       airControl: 1,
       suspension: 1,
+      nitro: 0,
     },
   },
 ];
