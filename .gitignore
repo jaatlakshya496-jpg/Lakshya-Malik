@@ -6,5 +6,6 @@ coverage/
 *.log
 *-output.txt
 *-out.txt
+*-log.txt
 .env*
 !.env.example
